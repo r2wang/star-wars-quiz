@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en" class="bg-slate-950 text-cyan-500 font-mono overflow-hidden">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>G.A.L.A. // Galactic Architecture Licensure Assessment</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+
+        :root {
+            --cyan: #06b6d4;
+            --dark: #020617;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', 'Monaco', 'Courier New', monospace;
+            background-color: var(--dark);
+            height: 100vh;
+            width: 100vw;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* CRT Scanline Effect */
+        .crt-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                rgba(18, 16, 16, 0) 50%,
+                rgba(0, 0, 0, 0.25) 50%
+            ),
+            linear-gradient(
+                90deg,
+                rgba(255, 0, 0, 0.06),
+                rgba(0, 255, 0, 0.02),
+                rgba(0, 0, 255, 0.06)
+            );
+            background-size: 100% 4px, 3px 100%;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        .screen-flicker {
+            animation: flicker 0.15s infinite;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.97; }
+            5% { opacity: 0.95; }
+            10% { opacity: 0.97; }
+            15% { opacity: 0.94; }
+            20% { opacity: 0.98; }
+            25% { opacity: 0.95; }
+            30% { opacity: 0.99; }
+            35% { opacity: 0.96; }
+            40% { opacity: 0.97; }
+            45% { opacity: 0.94; }
+            50% { opacity: 0.98; }
+            55% { opacity: 0.95; }
+            60% { opacity: 0.99; }
+            65% { opacity: 0.96; }
+            70% { opacity: 0.97; }
+            75% { opacity: 0.94; }
+            80% { opacity: 0.98; }
+            85% { opacity: 0.95; }
+            90% { opacity: 0.99; }
+            95% { opacity: 0.96; }
+            100% { opacity: 0.97; }
+        }
+
+        .glitch-text {
+            animation: glitch 3s infinite;
+        }
+
+        @keyframes glitch {
+            0% { transform: translate(0); text-shadow: none; }
+            2% { transform: translate(-2px, 2px); text-shadow: 2px 0 #ff00c1, -2px 0 #00fff9; }
+            4% { transform: translate(2px, -1px); text-shadow: none; }
+            100% { transform: translate(0); }
+        }
+
+        .terminal-container {
+            border: 1px solid var(--cyan);
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.2);
+        }
+
+        button {
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            outline: none;
+        }
+
+        @media (hover: hover) {
+            .option-btn:hover {
+                background-color: rgba(6, 182, 212, 0.2);
+                border-color: var(--cyan);
+            }
+        }
+
+        button:active {
+            transform: scale(0.98);
+            background-color: var(--cyan);
+            color: var(--dark);
+        }
+
+        .progress-bar {
+            height: 2px;
+            background: rgba(6, 182, 212, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--cyan);
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--dark);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--cyan);
+        }
+    </style>
+</head>
+<body class="screen-flicker p-4 flex flex-col items-center justify-center min-h-screen">
+    <div class="crt-overlay"></div>
+
+    <!-- Terminal Header -->
+    <header class="w-full max-w-lg mb-6 flex justify-between items-center text-[10px] uppercase opacity-70">
+        <div>SYS: G.A.L.A._OS_V4.0</div>
+        <div id="clock">TIME: 21:00:55</div>
+    </header>
+
+    <main id="app-container" class="w-full max-w-lg terminal-container bg-slate-950 p-6 relative overflow-y-auto max-h-[85vh]">
+        <div id="view-intro">
+            <h1 class="text-2xl font-bold mb-4 glitch-text leading-tight text-center">GALACTIC ARCHITECTURE LICENSURE ASSESSMENT</h1>
+            <p class="mb-6 text-sm leading-relaxed opacity-90 text-center">
+                Welcome, Candidate. You are appearing before the Board of Interstellar Urbanism. This assessment will evaluate your ideological compatibility with current planetary development mandates.
+            </p>
+            <div class="mb-8 p-3 border border-cyan-500/30 bg-cyan-500/5 text-xs italic">
+                NOTICE: Failures in spatial ethics may result in immediate revocation of transit credits or planetary exile.
+            </div>
+            <button onclick="startQuiz()" class="w-full py-4 border border-cyan-500 hover:bg-cyan-500 hover:text-slate-950 font-bold transition-colors">
+                [ INITIATE EXAMINATION ]
+            </button>
+        </div>
+
+        <div id="view-quiz" class="hidden">
+            <div class="progress-bar mb-6">
+                <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
+            </div>
+            
+            <div id="question-text" class="text-lg font-bold mb-8 leading-snug min-h-[80px]"></div>
+            <div id="options-container" class="space-y-4">
+                <!-- Options injected by JS -->
+            </div>
+        </div>
+
+        <div id="view-result" class="hidden text-center">
+            <h2 class="text-xl font-bold mb-4 glitch-text">RECRUITMENT CALL RECEIVED</h2>
+            
+            <!-- Result Character Visual -->
+            <div id="result-visual" class="w-full aspect-[3/4] mb-6 border border-cyan-500/20 bg-cyan-500/5 flex items-center justify-center overflow-hidden">
+                <!-- Character Blueprint injected here -->
+            </div>
+
+            <div id="result-status" class="text-xs mb-4 opacity-70 uppercase tracking-widest">
+                Alignment: [Calculating...]
+            </div>
+            <div id="result-text" class="text-sm leading-relaxed mb-10 p-4 border border-cyan-500/50 bg-cyan-500/10 italic">
+            </div>
+            <button onclick="resetQuiz()" class="w-full py-3 border border-cyan-500 text-xs hover:bg-cyan-500 hover:text-slate-950 transition-colors">
+                [ PURGE RECORDS & RE-EVALUATE ]
+            </button>
+        </div>
+    </main>
+
+    <footer class="w-full max-w-lg mt-6 text-[10px] text-center opacity-40 uppercase">
+        MAY THE 4TH BE WITH YOU
+    </footer>
+
+    <script shadow>
+        const questions = [
+            {
+                text: "Scenario 01: Grand Moff Tarkin demands a redesign of Coruscant Senate District. How do you approach the footprint?",
+                options: [
+                    { text: "Level the ancient spires for monolithic durasteel blocks and total-surveillance plazas.", archetype: "imperial" },
+                    { text: "Preserve the 'Level 1313' underworld charm, reinforcing the tunnels for the 'Free Coruscant' movement.", archetype: "rebel" },
+                    { text: "Establish high-density, pay-per-entry commerce hubs for the Pyke Syndicate with modular docking bays.", archetype: "mercenary" }
+                ]
+            },
+            {
+                text: "Scenario 02: General Rieekan reports that the ice caverns of Echo Base are structurally unstable. What is your intervention?",
+                options: [
+                    { text: "Abandon the site and drop a prefabricated AT-AT Garrison on the surface to ensure planetary dominance.", archetype: "imperial" },
+                    { text: "Prop up the vaults with salvaged X-Wing struts and scrap metal to keep the base functional.", archetype: "rebel" },
+                    { text: "Convert the base into a fleet of independent, modular cargo pods that can jump to lightspeed if found.", archetype: "mercenary" }
+                ]
+            },
+            {
+                text: "Scenario 03: Admiral Thrawn requests a museum on his Star Destroyer, the Chimaera. The layout must emphasize:",
+                options: [
+                    { text: "A singular aisle where the art of conquered worlds is displayed as trophies of Imperial order.", archetype: "imperial" },
+                    { text: "A decentralized gallery hidden in maintenance crawlspaces, celebrating the 'Spark' of indigenous cultures.", archetype: "rebel" },
+                    { text: "Holographic projectors and automated inventory droids leased from the Techno Union for maximum ROI.", archetype: "mercenary" }
+                ]
+            },
+            {
+                text: "Scenario 04: You are hired to expand Jabba the Hutt's Palace on Tatooine. What is the defining feature of the new wing?",
+                options: [
+                    { text: "A pure geometric sinkhole of smooth obsidian, leaving no room for hope or escape.", archetype: "imperial" },
+                    { text: "A sprawling series of adobe domes and recycled vaporators open to the local binary-sunset spirit.", archetype: "rebel" },
+                    { text: "A high-tech droid foundry and spice-refining facility managed by a neutral AI to maximize credits.", archetype: "mercenary" }
+                ]
+            },
+            {
+                text: "Scenario 05: The Galactic Emperor requires a private Sanctum on Exegol. Your structural proposal is:",
+                options: [
+                    { text: "A kilometer-high obelisk that funnels the planet's lightning through a singular architectural point.", archetype: "imperial" },
+                    { text: "A humble, hidden shrine built from reclaimed Jedi ruins, meant to outlast the Sith regime.", archetype: "rebel" },
+                    { text: "A sleek, stealth-coated orbital platform with encrypted channels to all Outer Rim contractors.", archetype: "mercenary" }
+                ]
+            }
+        ];
+
+        let currentQuestion = 0;
+        let scores = { imperial: 0, rebel: 0, mercenary: 0 };
+
+        function updateClock() {
+            const now = new Date();
+            const time = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            document.getElementById('clock').innerText = `TIME: ${time}`;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        function startQuiz() {
+            document.getElementById('view-intro').classList.add('hidden');
+            document.getElementById('view-quiz').classList.remove('hidden');
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('question-text').innerText = q.text;
+            document.getElementById('progress-fill').style.width = `${(currentQuestion / questions.length) * 100}%`;
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            
+            // Reset scroll position for mobile
+            document.getElementById('app-container').scrollTop = 0;
+            
+            // Shuffle options for each question
+            const shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
+            
+            shuffledOptions.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn w-full p-4 border border-cyan-500/30 text-left text-xs bg-cyan-500/5 transition-all flex items-start';
+                btn.innerHTML = `<span class="mr-3 opacity-50">[0${index + 1}]</span> <span>${opt.text}</span>`;
+                btn.onclick = (e) => {
+                    // Prevent double-clicks and clear focus
+                    btn.style.pointerEvents = 'none';
+                    selectOption(opt.archetype);
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        function selectOption(archetype) {
+            scores[archetype]++;
+            currentQuestion++;
+
+            if (currentQuestion < questions.length) {
+                renderQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            document.getElementById('view-quiz').classList.add('hidden');
+            document.getElementById('view-result').classList.remove('hidden');
+
+            const winner = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
+            const statusEl = document.getElementById('result-status');
+            const textEl = document.getElementById('result-text');
+            const visualEl = document.getElementById('result-visual');
+
+            if (winner === 'imperial') {
+                statusEl.innerText = "Alignment: [ THE SITH MODERNIST ]";
+                textEl.innerText = "The Dark Side is calling. You prioritize the Plan over the People. You find beauty in the cold efficiency of the monolith. Report to the Death Star for commissioning, Architect. Order is your only client.";
+                visualEl.innerHTML = `<img src="/assets/images/vader.png" 
+                    referrerPolicy="no-referrer"
+                    alt="Darth Vader" 
+                    class="w-full h-full object-cover">`;
+            } else if (winner === 'rebel') {
+                statusEl.innerText = "Alignment: [ THE REBEL INSURGENT ]";
+                textEl.innerText = "The Spark of Hope needs your ruins. You find light in the architecture of decay and the resilience of the reused. Join the resistance; your buildings breathe where the Empire's suffocate.";
+                visualEl.innerHTML = `<img src="/assets/images/leia.png" 
+                    referrerPolicy="no-referrer"
+                    alt="Princess Leia" 
+                    class="w-full h-full object-cover">`;
+            } else {
+                statusEl.innerText = "Alignment: [ THE SYNDICATE ARCHITECT ]";
+                textEl.innerText = "The highest bidder is waiting. You design for the code, not the cause. Your architecture is as fluid as your loyalty. Check your encrypted inbox for contracts. The galaxy is your construction site.";
+                visualEl.innerHTML = `<img src="/assets/images/boba.png" 
+                    referrerPolicy="no-referrer"
+                    alt="Boba Fett" 
+                    class="w-full h-full object-cover">`;
+            }
+        }
+
+        function resetQuiz() {
+            currentQuestion = 0;
+            scores = { imperial: 0, rebel: 0, mercenary: 0 };
+            document.getElementById('view-result').classList.add('hidden');
+            document.getElementById('view-intro').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
